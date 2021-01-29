@@ -43,7 +43,7 @@ const Login = () => {
   return (
     <Container component='main' maxWidth='xs' className={classes.container}>
       <CssBaseline />
-      <div className={classes.paper}>
+      <div className={classes.paper} style={{margin: 'auto'}}>
         <Typography component='h1' variant='h4'>
           TrelloClone
         </Typography>

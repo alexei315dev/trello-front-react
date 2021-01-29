@@ -30,7 +30,7 @@ const Dashboard = () => {
         <div className='boards'>
           {boards.map((board) => (
             <Link key={board._id} to={`/board/${board._id}`} className='board-card'>
-              {board.title}
+              <span style={{margin: 'auto'}}>{board.title}</span>
             </Link>
           ))}
           <CreateBoard />
