@@ -1,85 +1,101 @@
+import axios from 'axios';
+import { setAlert } from './alert';
 import {
-    FETCH_ERROR,
-    FETCH_START,
-    FETCH_SUCCESS,
-    INIT_URL,
-    SIGNOUT_USER_SUCCESS,
-    USER_DATA,
-    USER_TOKEN_SET,
-} from "../constants/ActionTypes";
-import axios from '../config/Api';
+  REGISTER_SUCCESS,
+  REGISTER_FAIL,
+  USER_LOADED,
+  AUTH_ERROR,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  LOGOUT,
+} from './types';
+import setAuthToken from '../utils/setAuthToken';
 
-import { createBrowserHistory } from 'history'
+// Load User
+export const loadUser = () => async (dispatch) => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
 
-export const history = createBrowserHistory();
+  try {
+    const res = await axios.get('/api/auth');
 
-export const setInitUrl = (url) => {
-    return {
-        type: INIT_URL,
-        payload: url
-    };
+    dispatch({
+      type: USER_LOADED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: AUTH_ERROR,
+    });
+  }
 };
 
-export const userSignUp = ({ username, email, password }) => {
-    console.log(username, email, password);
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.post('/register', {
-            username: username,
-            email: email,
-            password: password
-        }
-        ).then(({ data }) => {
-            localStorage.setItem("token", JSON.stringify(data.token));
-            axios.defaults.headers.common['Authorization'] = "Bearer " + data.token;
-            dispatch({ type: FETCH_SUCCESS });
-            dispatch({ type: USER_TOKEN_SET, payload: data.token });
-            dispatch({ type: INIT_URL, payload: '/pr/dashboard'})
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User registeration error !" });
-        });
+// Register User
+export const register = ({ name, email, password }) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({ name, email, password });
+
+  try {
+    const res = await axios.post('/api/users', body, config);
+
+    dispatch({
+      type: REGISTER_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadUser());
+  } catch (err) {
+    const errors = err.response.data.errors;
+
+    if (errors) {
+      errors.forEach((error) => dispatch(setAlert(error.msg, 'error')));
     }
+
+    dispatch({
+      type: REGISTER_FAIL,
+    });
+  }
 };
 
-export const userSignIn = ({ email, password }) => {
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.post('/login', {
-            email: email,
-            password: password,
-        }
-        ).then(({ data }) => {
-            console.log('data', data);
-            localStorage.setItem("token", JSON.stringify(data.token));
-            axios.defaults.headers.common['Authorization'] = "Bearer " + data.token;
-            dispatch({ type: USER_TOKEN_SET, payload: data.token });
-            dispatch({ type: FETCH_SUCCESS });
-            dispatch({ type: INIT_URL, payload: '/pr/dashboard'})
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User sign in error !" });
-            dispatch({ type: SIGNOUT_USER_SUCCESS });
-        });
+// Login User
+export const login = (email, password) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({ email, password });
+
+  try {
+    const res = await axios.post('/api/auth', body, config);
+
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadUser());
+  } catch (err) {
+    const errors = err.response.data.errors;
+
+    if (errors) {
+      errors.forEach((error) => dispatch(setAlert(error.msg, 'error')));
     }
+
+    dispatch({
+      type: LOGIN_FAIL,
+    });
+  }
 };
 
-export const getUser = () => {
-    return (dispatch) => {
-        dispatch({ type: FETCH_START });
-        axios.get('/me',
-        ).then(({ data }) => {
-            dispatch({ type: USER_TOKEN_SET, payload: data.user.token });
-            dispatch({ type: USER_DATA, payload: data.user });
-            dispatch({ type: FETCH_SUCCESS });
-        }).catch(err => {
-            dispatch({ type: FETCH_ERROR, payload: "User not found." });
-            dispatch({ type: SIGNOUT_USER_SUCCESS });
-        });
-    }
+// Logout
+export const logout = () => async (dispatch) => {
+  dispatch({ type: LOGOUT });
 };
-
-export const userSignOut = () => {
-    return (dispatch) => {
-        localStorage.removeItem('token');
-        dispatch({ type: SIGNOUT_USER_SUCCESS });
-    }
-}
