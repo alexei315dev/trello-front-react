@@ -25,3 +25,37 @@ body {
 .login-box {
   width: 400px;
 }
+
+.image-background {
+  background-image: url('./assets/media/photos/background.jpg');
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+#page-header {
+  background:  rgb(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+.main-container {
+  margin-top: 70px;
+}
+
+.boards {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.board-card {
+  display: flex;
+  width: 220px !important;
+  height: 120px !important;
+  margin: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  color: #fff;
+  border-radius: 10px;
+  background-color: #5067c5;
+  text-align: center;
+}

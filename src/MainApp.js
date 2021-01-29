@@ -4,9 +4,11 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import ReduxToastr from 'react-redux-toastr';
 
 import configureStore, { history } from "./store";
-import './style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-redux-toastr/lib/css/react-redux-toastr.min.css'
+import './assets/css/dashmix.css';
+import './assets/css/dashmix.min.css';
+import './style.css';
 import App from "./App";
 export const store = configureStore();
 
@@ -17,7 +19,7 @@ const MainApp = () =>
                 <Route path="/" render={(props) => (<App {...props} />)} />
             </Switch>
         </Router>
-        <ReduxToastr
+        {/* <ReduxToastr
             timeOut={4000}
             newestOnTop={false}
             preventDuplicates
@@ -26,7 +28,7 @@ const MainApp = () =>
             transitionIn="fadeIn"
             transitionOut="fadeOut"
             progressBar
-            closeOnToastrClick />
+            closeOnToastrClick /> */}
     </Provider>
 
 export default MainApp;
